@@ -29,7 +29,7 @@ Shader "Unlit/NewUnlitShader"
             //texture and transforms of the texture
             sampler2D _MainTex;
 
-            //variables to control the wave/Ping
+            //variables to control the wave
             float _PingDistance;
             float _WaveTrail;
             float4 _WaveColor;
@@ -61,7 +61,6 @@ Shader "Unlit/NewUnlitShader"
 
             //Absolute garbage, but I coded this in such a way that it works
             //I probably cannot remove anything
-            //This was a holdover for a different system I was doing
             fixed4 frag(v2f i) : SV_TARGET
             {
                 float depthRaw = tex2D(_CameraDepthTexture, i.uv).r;
@@ -78,7 +77,6 @@ Shader "Unlit/NewUnlitShader"
                 
                 if(step( depth * 40, _PingDistance))
                 {
-                    //Lerps between black and white
                     float thing = lerp(0, _WaveColor, wave);
                     return thing;
                 }
@@ -86,7 +84,7 @@ Shader "Unlit/NewUnlitShader"
                 if(depthRaw >= _ProjectionParams.z)
                     return 0;
             
-                //return 0 because we don't want to see anything else
+                //return depth;
                 return 0;
             }
 

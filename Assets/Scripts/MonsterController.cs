@@ -80,11 +80,6 @@ public class MonsterController : MonoBehaviour
         return isHunting;
     }
 
-    public void flipHuntable()
-    {
-        canHunt = !canHunt;
-    }
-
     public void stopHunting()
     {
         isHunting = false;
