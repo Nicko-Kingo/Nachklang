@@ -80,7 +80,7 @@ public class Ping : MonoBehaviour
 	private void OnRenderImage(RenderTexture source, RenderTexture destination){
 		
 		//draws the pixels from the source texture to the destination texture
-		if(manual || pingDistance > 0)
+		if(manual || waveDistance < 150)
         {
             PostprocessMaterial.SetFloat("_PingDistance", pingDistance);
              PostprocessMaterial.SetFloat("_WaveDistance", waveDistance);
