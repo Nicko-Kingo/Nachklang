@@ -2,7 +2,6 @@
 using System.Collections;
 
 using UnityEngine;
-using UnityEngine.UIElements;
 
 
 public class MonsterController : MonoBehaviour
@@ -17,7 +16,7 @@ public class MonsterController : MonoBehaviour
     private System.Random rnd;
 
     [SerializeField]
-    private float spawnDistance;
+    private float spawnDistance = 15f;
 
     private AudioSource chaseAudio;
 
@@ -43,11 +42,8 @@ public class MonsterController : MonoBehaviour
         isHunting = false;
         player = FindObjectOfType<PlayerController>();
         speed = player.getSpeed() * .80f;
-        //speed = 0;
         baseSpeed = speed;
         ui = FindObjectOfType<UIController>();
-        gameObject.GetComponent<CapsuleCollider>().enabled = false;
-
         
     }
 
@@ -97,7 +93,7 @@ public class MonsterController : MonoBehaviour
 
     private void startHunt()
     {
-        moveTimer = 2;
+        moveTimer = 1;
         chase();
         spawnMonster();
         chaseAudio.Play();
@@ -114,19 +110,22 @@ public class MonsterController : MonoBehaviour
     private void spawnMonster()
     {
         
-        Vector3 playerPos = player.transform.position;
-        Vector3 playerDirection = player.transform.forward;
-        float distance = Random.Range(1f, spawnDistance);
+            float random1 = UnityEngine.Random.Range(0f,1f);
+            float random2 = UnityEngine.Random.Range(0f,1f);
 
-        Vector3 spawn = playerPos + playerDirection*distance;
+            Vector3 randomPositionOnScreen = ScreenPositionIntoWorld(
+            // example screen center:
+            new Vector2(random1, random2),
+            // distance into the world from the screen:
+            UnityEngine.Random.Range(.25f, spawnDistance)
+            );
 
-        spawn.x += Random.Range(-distance/1.3f, distance/1.3f);
-        spawn.y = 0.75f;
 
-        gameObject.transform.position = spawn;
+        
+
+        gameObject.transform.position = new Vector3(randomPositionOnScreen.x, 1f, randomPositionOnScreen.normalized.z * spawnDistance);
 
         model.GetComponent<MeshRenderer>().enabled = true;
-        Debug.Log(gameObject.transform.position.ToString());
 
     }
 
@@ -139,29 +138,16 @@ public class MonsterController : MonoBehaviour
         stopHunting();
         StopCoroutine(chasing());
         speed = baseSpeed;
-        gameObject.GetComponent<CapsuleCollider>().enabled = false;
-
-        
     }
 
     private void despawnMonster()
     {
         model.GetComponent<MeshRenderer>().enabled = false;
-        gameObject.transform.position = new Vector3(99,99,99);
     }
 
-    public void chase(bool pinged = false)
+    public void chase()
     {
-        if(pinged || player.GetComponent<Rigidbody>().velocity.magnitude > 0)
-        {
-            currentTarget = player.transform.position;
-        }
-        else //choose a random point near the player
-        {
-            Vector3 pos = player.transform.position;
-            Vector3 Newpos = new Vector3(Random.Range(pos.x-1.5f, pos.x+1.5f),0.75f,Random.Range(pos.z-1.5f,pos.z+1.5f));
-            currentTarget = Newpos;
-        }
+        currentTarget = player.transform.position;
     }
 
     private IEnumerator chasing()
@@ -177,7 +163,6 @@ public class MonsterController : MonoBehaviour
     public void speedUp()
     {
         speed *= 1.30f;
-        chaseAudio.pitch *= 1.30f;
     }
 
     private void move()
@@ -189,11 +174,8 @@ public class MonsterController : MonoBehaviour
     private IEnumerator wait()
     {
         Debug.Log("wait started");
-        yield return new WaitForSeconds(2f);
-
+        yield return new WaitForSeconds(1f);
         Debug.Log("wait finished");
-
-        gameObject.GetComponent<CapsuleCollider>().enabled = true;
 
 
         moveTimer = 0;
@@ -209,6 +191,7 @@ public class MonsterController : MonoBehaviour
             
             ui.hit();
 
+            gameObject.transform.position = new Vector3(99,99,99);
         }
 
         //stop the hunt if there was a hit

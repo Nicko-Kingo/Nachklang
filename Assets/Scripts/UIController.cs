@@ -24,10 +24,6 @@ public class UIController : MonoBehaviour
 
     public void backToStart()
     {
-        if(Time.timeScale == 0)
-        {
-            Time.timeScale = 1;
-        }
         SceneManager.LoadScene("Start Screen");
     }
 
@@ -76,6 +72,7 @@ public class UIController : MonoBehaviour
     {
         for (float i = 1; i >= 0; i -= Time.deltaTime)
             {
+                Debug.Log(i);
                 // set color with i as alpha
                 img.color = new Color(1, 1, 1, i);
                 yield return null;

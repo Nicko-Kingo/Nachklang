@@ -125,7 +125,6 @@ public class PlayerController : MonoBehaviour
         {
             huntTimer += 1f;
             monster.speedUp();
-            monster.chase(true);
         }
 
         if(pingBuffer == 0)
