@@ -4,7 +4,6 @@ Shader "Unlit/NewUnlitShader"
     Properties{
         [HideInInspector]_MainTex ("Texture", 2D) = "white" {}
         [Header(Wave)]
-        _PingDistance ("Distance from player", float) = 10
         _WaveDistance ("Distance of wave", float) = 10
         _WaveTrail ("Length of the trail", Range(0,8)) = 1
         _WaveColor ("Color", Color) = (1,0,0,1)
@@ -30,7 +29,6 @@ Shader "Unlit/NewUnlitShader"
             sampler2D _MainTex;
 
             //variables to control the wave/Ping
-            float _PingDistance;
             float _WaveTrail;
             float4 _WaveColor;
             float _WaveDistance;
@@ -64,11 +62,14 @@ Shader "Unlit/NewUnlitShader"
             //This was a holdover for a different system I was doing
             fixed4 frag(v2f i) : SV_TARGET
             {
+                
                 float depthRaw = tex2D(_CameraDepthTexture, i.uv).r;
                 //get depth from depth texture
                 float depth =   lerp(.1, .9 , depthRaw) ;
+
                 //linear depth between camera and far clipping plane
                 depthRaw = Linear01Depth(depthRaw);
+
                 //depth as distance from camera in units
                 depthRaw = depthRaw * _ProjectionParams.z;
 
@@ -76,11 +77,11 @@ Shader "Unlit/NewUnlitShader"
                 float waveTrail = smoothstep(_WaveDistance - _WaveTrail, _WaveDistance, depthRaw);
                 float wave = waveFront * waveTrail;
                 
-                if(step( depth * 40, _PingDistance))
+                if(step( depth, _WaveDistance))
                 {
                     //Lerps between black and white
-                    float thing = lerp(0, _WaveColor, wave);
-                    return thing;
+                    float ping = lerp(0, _WaveColor, wave);
+                    return ping;
                 }
 
                 if(depthRaw >= _ProjectionParams.z)

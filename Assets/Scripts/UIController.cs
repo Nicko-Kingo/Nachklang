@@ -19,7 +19,12 @@ public class UIController : MonoBehaviour
 
     public void play()
     {
+        if(Time.timeScale == 0)
+        {
+            Time.timeScale = 1;
+        }
         SceneManager.LoadScene("MainScene");
+        
     }
 
     public void backToStart()

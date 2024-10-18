@@ -16,7 +16,6 @@ public class Ping : MonoBehaviour
     [SerializeField]
     private bool waveActive;
 	
-    private float pingDistance;
     private float waveDistance;
 
     [SerializeField]
@@ -29,7 +28,6 @@ public class Ping : MonoBehaviour
 	private void Start()
     {
         player = FindObjectOfType<PlayerController>();
-        pingDistance = 50;
 		//get the camera and tell it to render a depth texture
 		Camera cam = GetComponent<Camera>();
 		cam.depthTextureMode = cam.depthTextureMode | DepthTextureMode.Depth;
@@ -41,7 +39,6 @@ public class Ping : MonoBehaviour
         if(Input.GetKeyDown("space"))
         {
             manual = true;
-            pingDistance = 20;
             waveActive = true;
             waveDistance = 0;
             source.clip = audio;
@@ -55,13 +52,6 @@ public class Ping : MonoBehaviour
             stuff.a -= .1f;
             PostprocessMaterial.color = stuff;
         }
-
-        //Gives the player a little time to see how things look
-        if(pingDistance > 0)
-        {
-            pingDistance -= waveSpeed * .9f *  Time.deltaTime;
-        }
-
 
         if(waveActive)
         {
@@ -80,9 +70,8 @@ public class Ping : MonoBehaviour
 	private void OnRenderImage(RenderTexture source, RenderTexture destination){
 		
 		//draws the pixels from the source texture to the destination texture
-		if(manual || waveDistance < 150)
+		if(manual || waveDistance < 75)
         {
-            PostprocessMaterial.SetFloat("_PingDistance", pingDistance);
              PostprocessMaterial.SetFloat("_WaveDistance", waveDistance);
             Graphics.Blit(source, destination, PostprocessMaterial);
             manual = false;
