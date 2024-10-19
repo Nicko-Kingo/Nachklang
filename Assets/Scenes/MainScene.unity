@@ -249,7 +249,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.5, y: 0.5, z: 0.5}
+  m_Size: {x: 0.3, y: 0.5, z: 0.3}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &148821719
 Rigidbody:
@@ -1449,6 +1449,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PostprocessMaterial: {fileID: 2100000, guid: 8ae0c54648755aa4da1fdc080ded6a66, type: 2}
   waveSpeed: 7.5
+  maxWaveDistance: 75
   waveActive: 0
   audio: {fileID: 8300000, guid: 7617159bbe1092a4893806c8f8d4ebdf, type: 3}
   source: {fileID: 1442655565}

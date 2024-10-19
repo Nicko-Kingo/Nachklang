@@ -2,11 +2,11 @@ Shader "Unlit/NewUnlitShader"
 {
     //show values to edit in inspector
     Properties{
-        [HideInInspector]_MainTex ("Texture", 2D) = "white" {}
+        _MainTex ("main texture", 2D) = "white" {}
         [Header(Wave)]
-        _WaveDistance ("Distance of wave", float) = 10
         _WaveTrail ("Length of the trail", Range(0,8)) = 1
         _WaveColor ("Color", Color) = (1,0,0,1)
+        
     }
 
     SubShader{
@@ -21,6 +21,7 @@ Shader "Unlit/NewUnlitShader"
             //include useful shader functions
             #include "UnityCG.cginc"
 
+            
             //define vertex and fragment shader
             #pragma vertex vert
             #pragma fragment frag
@@ -28,10 +29,17 @@ Shader "Unlit/NewUnlitShader"
             //texture and transforms of the texture
             sampler2D _MainTex;
 
+            cbuffer MyBuffer : register(b0)
+            {
+                float _Waves[5];
+            }
+
+
             //variables to control the wave/Ping
             float _WaveTrail;
             float4 _WaveColor;
             float _WaveDistance;
+            int _NumWaves;
 
             //the object data that's put into the vertex shader
             struct appdata{
@@ -56,6 +64,7 @@ Shader "Unlit/NewUnlitShader"
 
             //the fragment shader
             sampler2D _CameraDepthTexture;
+          
 
             //Absolute garbage, but I coded this in such a way that it works
             //I probably cannot remove anything
@@ -64,6 +73,10 @@ Shader "Unlit/NewUnlitShader"
             {
                 
                 float depthRaw = tex2D(_CameraDepthTexture, i.uv).r;
+
+                
+                float4 enviroTex = tex2D(_MainTex, i.uv);
+
                 //get depth from depth texture
                 float depth =   lerp(.1, .9 , depthRaw) ;
 
@@ -73,22 +86,45 @@ Shader "Unlit/NewUnlitShader"
                 //depth as distance from camera in units
                 depthRaw = depthRaw * _ProjectionParams.z;
 
-                float waveFront = step(depthRaw, _WaveDistance);
-                float waveTrail = smoothstep(_WaveDistance - _WaveTrail, _WaveDistance, depthRaw);
-                float wave = waveFront * waveTrail;
-                
-                if(step( depth, _WaveDistance))
+                float ping = 0;
+
+                for(int i = 0; i < _NumWaves; i++)
                 {
-                    //Lerps between black and white
-                    float ping = lerp(0, _WaveColor, wave);
-                    return ping;
+                    
+                    //Creates the hard color at the exact point of the wave
+                    float waveFront = step(depthRaw, _Waves[i]);
+
+                    //Creates the trail of the wave based on depth
+                    float waveTrail = smoothstep(_Waves[i] - _WaveTrail, _Waves[i], depthRaw);
+                    float wave = waveFront * waveTrail;
+                
+                    
+                    if(step( depth, _Waves[i]))
+                    {
+                        //Lerps between black and white
+                        //adding to the ping allows every ping to exist simultaneously 
+                        ping += lerp(0, _WaveColor, wave);
+                    }
+
                 }
 
-                if(depthRaw >= _ProjectionParams.z)
-                    return 0;
+
+                
+                /*
+                //If I want the ping to pass over the original textures
+                //Envirotex is the original texture, cant have it downhere for some reason
+                if(ping == 0.0)
+                {
+                    return enviroTex;
+                }
+
+                return lerp(enviroTex, _WaveColor, ping); 
+
+                */
+                
             
-                //return 0 because we don't want to see anything else
-                return 0;
+               
+                return ping;
             }
 
 
